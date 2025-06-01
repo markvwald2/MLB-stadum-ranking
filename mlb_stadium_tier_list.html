@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Stadiums Tier List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+            padding: 10px;
+            touch-action: manipulation;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+        }
+
+        .tier-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tier-row {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .tier-label {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            border-radius: 8px;
+            margin-right: 10px;
+            flex-shrink: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .tier-s { background: linear-gradient(135deg, #00ff00, #32cd32); }
+        .tier-a { background: linear-gradient(135deg, #9acd32, #7cfc00); }
+        .tier-b { background: linear-gradient(135deg, #daa520, #ffd700); }
+        .tier-c { background: linear-gradient(135deg, #ff8c00, #ffa500); }
+        .tier-d { background: linear-gradient(135deg, #ff4500, #ff6347); }
+        .tier-f { background: linear-gradient(135deg, #dc143c, #ff1493); }
+
+        .tier-content {
+            flex: 1;
+            min-height: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+            padding: 5px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tier-content.drag-over {
+            border-color: #00ff00;
+            background: rgba(0,255,0,0.1);
+            transform: scale(1.02);
+        }
+
+        .team-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 10px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .team-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .team-logo.dragging {
+            opacity: 0.7;
+            transform: scale(1.1) rotate(10deg);
+            z-index: 1000;
+            cursor: grabbing;
+        }
+
+        .unranked-section {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .unranked-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .unranked-teams {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            min-height: 50px;
+            padding: 5px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 8px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Team-specific colors */
+        .team-angels { background: #BA132A; }
+        .team-astros { background: #EB6100; }
+        .team-athletics { background: #003831; }
+        .team-bluejays { background: #134A8E; }
+        .team-braves { background: #CE1141; }
+        .team-brewers { background: #0A2351; }
+        .team-cardinals { background: #C41E3A; }
+        .team-cubs { background: #0E3386; }
+        .team-diamondbacks { background: #A71930; }
+        .team-dodgers { background: #005A9C; }
+        .team-giants { background: #FD5A1E; }
+        .team-guardians { background: #E31937; }
+        .team-mariners { background: #0C2C56; }
+        .team-marlins { background: #00A3E0; }
+        .team-mets { background: #002D72; }
+        .team-nationals { background: #AB0003; }
+        .team-orioles { background: #DF4601; }
+        .team-padres { background: #2F241D; }
+        .team-phillies { background: #E81828; }
+        .team-pirates { background: #FDB827; }
+        .team-rangers { background: #003278; }
+        .team-rays { background: #092C5C; }
+        .team-redsox { background: #BD3039; }
+        .team-reds { background: #C6011F; }
+        .team-rockies { background: #33006F; }
+        .team-royals { background: #004687; }
+        .team-tigers { background: #0C2340; }
+        .team-twins { background: #002B5C; }
+        .team-whitesox { background: #27251F; }
+        .team-yankees { background: #132448; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+            }
+            
+            .tier-row {
+                padding: 6px;
+            }
+            
+            .tier-label {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+                margin-right: 8px;
+            }
+            
+            .tier-content {
+                min-height: 50px;
+                gap: 3px;
+                padding: 3px;
+            }
+            
+            .team-logo {
+                width: 35px;
+                height: 35px;
+                font-size: 9px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+                margin: 0 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MLB STADIUMS TIER LIST</h1>
+        
+        <div class="tier-container">
+            <div class="tier-row">
+                <div class="tier-label tier-s">S</div>
+                <div class="tier-content" data-tier="S"></div>
+            </div>
+            
+            <div class="tier-row">
+                <div class="tier-label tier-a">A</div>
+                <div class="tier-content" data-tier="A"></div>
+            </div>
+            
+            <div class="tier-row">
+                <div class="tier-label tier-b">B</div>
+                <div class="tier-content" data-tier="B"></div>
+            </div>
+            
+            <div class="tier-row">
+                <div class="tier-label tier-c">C</div>
+                <div class="tier-content" data-tier="C"></div>
+            </div>
+            
+            <div class="tier-row">
+                <div class="tier-label tier-d">D</div>
+                <div class="tier-content" data-tier="D"></div>
+            </div>
+            
+            <div class="tier-row">
+                <div class="tier-label tier-f">F</div>
+                <div class="tier-content" data-tier="F"></div>
+            </div>
+        </div>
+        
+        <div class="unranked-section">
+            <div class="unranked-title">Drag Teams to Tiers</div>
+            <div class="unranked-teams" data-tier="unranked"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="resetTiers()">Reset All</button>
+            <button class="btn" onclick="takeScreenshot()">Take Screenshot</button>
+        </div>
+    </div>
+
+    <script>
+        // MLB team data
+        const teams = [
+            { name: 'LAA', fullName: 'Angels', class: 'team-angels' },
+            { name: 'HOU', fullName: 'Astros', class: 'team-astros' },
+            { name: 'OAK', fullName: 'Athletics', class: 'team-athletics' },
+            { name: 'TOR', fullName: 'Blue Jays', class: 'team-bluejays' },
+            { name: 'ATL', fullName: 'Braves', class: 'team-braves' },
+            { name: 'MIL', fullName: 'Brewers', class: 'team-brewers' },
+            { name: 'STL', fullName: 'Cardinals', class: 'team-cardinals' },
+            { name: 'CHC', fullName: 'Cubs', class: 'team-cubs' },
+            { name: 'ARI', fullName: 'Diamondbacks', class: 'team-diamondbacks' },
+            { name: 'LAD', fullName: 'Dodgers', class: 'team-dodgers' },
+            { name: 'SF', fullName: 'Giants', class: 'team-giants' },
+            { name: 'CLE', fullName: 'Guardians', class: 'team-guardians' },
+            { name: 'SEA', fullName: 'Mariners', class: 'team-mariners' },
+            { name: 'MIA', fullName: 'Marlins', class: 'team-marlins' },
+            { name: 'NYM', fullName: 'Mets', class: 'team-mets' },
+            { name: 'WSH', fullName: 'Nationals', class: 'team-nationals' },
+            { name: 'BAL', fullName: 'Orioles', class: 'team-orioles' },
+            { name: 'SD', fullName: 'Padres', class: 'team-padres' },
+            { name: 'PHI', fullName: 'Phillies', class: 'team-phillies' },
+            { name: 'PIT', fullName: 'Pirates', class: 'team-pirates' },
+            { name: 'TEX', fullName: 'Rangers', class: 'team-rangers' },
+            { name: 'TB', fullName: 'Rays', class: 'team-rays' },
+            { name: 'BOS', fullName: 'Red Sox', class: 'team-redsox' },
+            { name: 'CIN', fullName: 'Reds', class: 'team-reds' },
+            { name: 'COL', fullName: 'Rockies', class: 'team-rockies' },
+            { name: 'KC', fullName: 'Royals', class: 'team-royals' },
+            { name: 'DET', fullName: 'Tigers', class: 'team-tigers' },
+            { name: 'MIN', fullName: 'Twins', class: 'team-twins' },
+            { name: 'CWS', fullName: 'White Sox', class: 'team-whitesox' },
+            { name: 'NYY', fullName: 'Yankees', class: 'team-yankees' }
+        ];
+
+        let draggedElement = null;
+
+        function initializeTeams() {
+            const unrankedContainer = document.querySelector('[data-tier="unranked"]');
+            
+            teams.forEach(team => {
+                const teamElement = document.createElement('div');
+                teamElement.className = `team-logo ${team.class}`;
+                teamElement.textContent = team.name;
+                teamElement.title = team.fullName;
+                teamElement.draggable = true;
+                teamElement.dataset.team = team.name;
+                
+                // Mouse events
+                teamElement.addEventListener('dragstart', handleDragStart);
+                teamElement.addEventListener('dragend', handleDragEnd);
+                
+                // Touch events for mobile
+                teamElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+                teamElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+                teamElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+                
+                unrankedContainer.appendChild(teamElement);
+            });
+            
+            // Add drop zone listeners
+            document.querySelectorAll('.tier-content').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        // Mouse drag handlers
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            if (draggedElement && draggedElement !== this) {
+                this.appendChild(draggedElement);
+            }
+        }
+
+        // Touch handlers for mobile
+        let touchStartPos = { x: 0, y: 0 };
+        let touchElement = null;
+
+        function handleTouchStart(e) {
+            touchElement = this;
+            this.classList.add('dragging');
+            const touch = e.touches[0];
+            touchStartPos = { x: touch.clientX, y: touch.clientY };
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchElement) return;
+            
+            const touch = e.touches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Find the nearest tier content
+            const tierContent = elementBelow?.closest('.tier-content');
+            
+            // Remove drag-over from all tiers
+            document.querySelectorAll('.tier-content').forEach(tier => {
+                tier.classList.remove('drag-over');
+            });
+            
+            // Add drag-over to current tier
+            if (tierContent) {
+                tierContent.classList.add('drag-over');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchElement) return;
+            
+            touchElement.classList.remove('dragging');
+            
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const tierContent = elementBelow?.closest('.tier-content');
+            
+            // Remove drag-over from all tiers
+            document.querySelectorAll('.tier-content').forEach(tier => {
+                tier.classList.remove('drag-over');
+            });
+            
+            // Move element if dropped on a valid tier
+            if (tierContent && tierContent !== touchElement.parentElement) {
+                tierContent.appendChild(touchElement);
+            }
+            
+            touchElement = null;
+        }
+
+        function resetTiers() {
+            const unrankedContainer = document.querySelector('[data-tier="unranked"]');
+            document.querySelectorAll('.team-logo').forEach(team => {
+                unrankedContainer.appendChild(team);
+            });
+        }
+
+        function takeScreenshot() {
+            // Hide controls temporarily
+            const controls = document.querySelector('.controls');
+            controls.style.display = 'none';
+            
+            // Use html2canvas if available, or show instructions
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(document.body).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'mlb-stadium-tier-list.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    controls.style.display = 'block';
+                });
+            } else {
+                alert('To take a screenshot, use your browser\'s screenshot tool or right-click and "Save as image"');
+                controls.style.display = 'block';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeTeams);
+    </script>
+</body>
+</html>
