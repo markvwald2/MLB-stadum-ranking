@@ -31,7 +31,6 @@
             font-weight: 900;
             letter-spacing: 2px;
             margin-bottom: 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
         }
 
         .tier-container {
@@ -63,7 +62,7 @@
             border-radius: 8px;
             margin-right: 10px;
             flex-shrink: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
         }
 
         .tier-s { background: linear-gradient(135deg, #00ff00, #32cd32); }
@@ -71,7 +70,7 @@
         .tier-b { background: linear-gradient(135deg, #daa520, #ffd700); }
         .tier-c { background: linear-gradient(135deg, #ff8c00, #ffa500); }
         .tier-d { background: linear-gradient(135deg, #ff4500, #ff6347); }
-        .tier-f { background: linear-gradient(135deg, #dc143c, #ff1493); }
+        .tier-f { background: linear-gradient(135deg, #dc143c, #ff0000); }
 
         .tier-content {
             flex: 1;
@@ -106,7 +105,31 @@
             font-weight: bold;
             font-size: 10px;
             color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.35);
+			position: relative;
+			overflow: hidden;
+		    padding: 6px;
+        }
+
+        .team-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .team-logo .fallback-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            display: none;
+        }
+
+        .team-logo img:not([src]) + .fallback-text,
+        .team-logo img[src=""] + .fallback-text {
+            display: block;
         }
 
         .team-logo:hover {
@@ -153,7 +176,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #007AFF;
             border: none;
             color: white;
             padding: 10px 20px;
@@ -172,29 +195,29 @@
         }
 
         /* Team-specific colors */
-        .team-angels { background: #BA132A; }
-        .team-astros { background: #EB6100; }
+        .team-angels { background: #BA0021; }
+        .team-astros { background: #002D62; }
         .team-athletics { background: #003831; }
         .team-bluejays { background: #134A8E; }
-        .team-braves { background: #CE1141; }
+        .team-braves { background: #13274F; }
         .team-brewers { background: #0A2351; }
         .team-cardinals { background: #C41E3A; }
         .team-cubs { background: #0E3386; }
-        .team-diamondbacks { background: #A71930; }
+        .team-diamondbacks { background: #000000; }
         .team-dodgers { background: #005A9C; }
         .team-giants { background: #FD5A1E; }
-        .team-guardians { background: #E31937; }
+        .team-guardians { background: #00385D; }
         .team-mariners { background: #0C2C56; }
         .team-marlins { background: #00A3E0; }
         .team-mets { background: #002D72; }
         .team-nationals { background: #AB0003; }
-        .team-orioles { background: #DF4601; }
+        .team-orioles { background: #000000; }
         .team-padres { background: #2F241D; }
         .team-phillies { background: #E81828; }
-        .team-pirates { background: #FDB827; }
+        .team-pirates { background: #27251F; }
         .team-rangers { background: #003278; }
         .team-rays { background: #092C5C; }
-        .team-redsox { background: #BD3039; }
+        .team-redsox { background: #0C2340; }
         .team-reds { background: #C6011F; }
         .team-rockies { background: #33006F; }
         .team-royals { background: #004687; }
@@ -235,6 +258,7 @@
                 width: 35px;
                 height: 35px;
                 font-size: 9px;
+		        padding: 4px;
             }
             
             .btn {
@@ -282,7 +306,7 @@
         </div>
         
         <div class="unranked-section">
-            <div class="unranked-title">Drag Teams to Tiers</div>
+            <div class="unranked-title">Drag teams to tiers</div>
             <div class="unranked-teams" data-tier="unranked"></div>
         </div>
         
@@ -293,40 +317,40 @@
     </div>
 
     <script>
-        // MLB team data
-        const teams = [
-            { name: 'LAA', fullName: 'Angels', class: 'team-angels' },
-            { name: 'HOU', fullName: 'Astros', class: 'team-astros' },
-            { name: 'OAK', fullName: 'Athletics', class: 'team-athletics' },
-            { name: 'TOR', fullName: 'Blue Jays', class: 'team-bluejays' },
-            { name: 'ATL', fullName: 'Braves', class: 'team-braves' },
-            { name: 'MIL', fullName: 'Brewers', class: 'team-brewers' },
-            { name: 'STL', fullName: 'Cardinals', class: 'team-cardinals' },
-            { name: 'CHC', fullName: 'Cubs', class: 'team-cubs' },
-            { name: 'ARI', fullName: 'Diamondbacks', class: 'team-diamondbacks' },
-            { name: 'LAD', fullName: 'Dodgers', class: 'team-dodgers' },
-            { name: 'SF', fullName: 'Giants', class: 'team-giants' },
-            { name: 'CLE', fullName: 'Guardians', class: 'team-guardians' },
-            { name: 'SEA', fullName: 'Mariners', class: 'team-mariners' },
-            { name: 'MIA', fullName: 'Marlins', class: 'team-marlins' },
-            { name: 'NYM', fullName: 'Mets', class: 'team-mets' },
-            { name: 'WSH', fullName: 'Nationals', class: 'team-nationals' },
-            { name: 'BAL', fullName: 'Orioles', class: 'team-orioles' },
-            { name: 'SD', fullName: 'Padres', class: 'team-padres' },
-            { name: 'PHI', fullName: 'Phillies', class: 'team-phillies' },
-            { name: 'PIT', fullName: 'Pirates', class: 'team-pirates' },
-            { name: 'TEX', fullName: 'Rangers', class: 'team-rangers' },
-            { name: 'TB', fullName: 'Rays', class: 'team-rays' },
-            { name: 'BOS', fullName: 'Red Sox', class: 'team-redsox' },
-            { name: 'CIN', fullName: 'Reds', class: 'team-reds' },
-            { name: 'COL', fullName: 'Rockies', class: 'team-rockies' },
-            { name: 'KC', fullName: 'Royals', class: 'team-royals' },
-            { name: 'DET', fullName: 'Tigers', class: 'team-tigers' },
-            { name: 'MIN', fullName: 'Twins', class: 'team-twins' },
-            { name: 'CWS', fullName: 'White Sox', class: 'team-whitesox' },
-            { name: 'NYY', fullName: 'Yankees', class: 'team-yankees' }
-        ];
-
+		// MLB team data with logo URLs
+		const teams = [
+		    { name: 'LAA', fullName: 'Angels', class: 'team-angels', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/108.svg' },
+		    { name: 'HOU', fullName: 'Astros', class: 'team-astros', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/117.svg' },
+		    { name: 'OAK', fullName: 'Athletics', class: 'team-athletics', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/133.svg' },
+		    { name: 'TOR', fullName: 'Blue Jays', class: 'team-bluejays', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/141.svg' },
+		    { name: 'ATL', fullName: 'Braves', class: 'team-braves', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/144.svg' },
+		    { name: 'MIL', fullName: 'Brewers', class: 'team-brewers', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/158.svg' },
+		    { name: 'STL', fullName: 'Cardinals', class: 'team-cardinals', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/138.svg' },
+		    { name: 'CHC', fullName: 'Cubs', class: 'team-cubs', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/112.svg' },
+		    { name: 'ARI', fullName: 'Diamondbacks', class: 'team-diamondbacks', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/109.svg' },
+		    { name: 'LAD', fullName: 'Dodgers', class: 'team-dodgers', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/119.svg' },
+		    { name: 'SF', fullName: 'Giants', class: 'team-giants', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/137.svg' },
+		    { name: 'CLE', fullName: 'Guardians', class: 'team-guardians', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/114.svg' },
+		    { name: 'SEA', fullName: 'Mariners', class: 'team-mariners', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/136.svg' },
+		    { name: 'MIA', fullName: 'Marlins', class: 'team-marlins', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/146.svg' },
+		    { name: 'NYM', fullName: 'Mets', class: 'team-mets', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/121.svg' },
+		    { name: 'WSH', fullName: 'Nationals', class: 'team-nationals', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/120.svg' },
+		    { name: 'BAL', fullName: 'Orioles', class: 'team-orioles', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/110.svg' },
+		    { name: 'SD', fullName: 'Padres', class: 'team-padres', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/135.svg' },
+		    { name: 'PHI', fullName: 'Phillies', class: 'team-phillies', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/143.svg' },
+		    { name: 'PIT', fullName: 'Pirates', class: 'team-pirates', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/134.svg' },
+		    { name: 'TEX', fullName: 'Rangers', class: 'team-rangers', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/140.svg' },
+		    { name: 'TB', fullName: 'Rays', class: 'team-rays', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/139.svg' },
+		    { name: 'BOS', fullName: 'Red Sox', class: 'team-redsox', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/111.svg' },
+		    { name: 'CIN', fullName: 'Reds', class: 'team-reds', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/113.svg' },
+		    { name: 'COL', fullName: 'Rockies', class: 'team-rockies', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/115.svg' },
+		    { name: 'KC', fullName: 'Royals', class: 'team-royals', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/118.svg' },
+		    { name: 'DET', fullName: 'Tigers', class: 'team-tigers', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/116.svg' },
+		    { name: 'MIN', fullName: 'Twins', class: 'team-twins', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/142.svg' },
+		    { name: 'CWS', fullName: 'White Sox', class: 'team-whitesox', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/145.svg' },
+		    { name: 'NYY', fullName: 'Yankees', class: 'team-yankees', logo: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/147.svg' }
+		];
+		
         let draggedElement = null;
 
         function initializeTeams() {
@@ -335,11 +359,29 @@
             teams.forEach(team => {
                 const teamElement = document.createElement('div');
                 teamElement.className = `team-logo ${team.class}`;
-                teamElement.textContent = team.name;
                 teamElement.title = team.fullName;
                 teamElement.draggable = true;
                 teamElement.dataset.team = team.name;
                 
+                // Create image element
+                const img = document.createElement('img');
+                img.src = team.logo;
+                img.alt = team.fullName;
+                img.onerror = function() {
+                    // Hide image and show fallback text if logo fails to load
+                    this.style.display = 'none';
+                    fallbackText.style.display = 'block';
+                };
+                
+                // Create fallback text
+                const fallbackText = document.createElement('div');
+                fallbackText.className = 'fallback-text';
+                fallbackText.textContent = team.name;
+                fallbackText.style.display = 'none';
+                
+                teamElement.appendChild(img);
+                teamElement.appendChild(fallbackText);
+				
                 // Mouse events
                 teamElement.addEventListener('dragstart', handleDragStart);
                 teamElement.addEventListener('dragend', handleDragEnd);
